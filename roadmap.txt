@@ -1,0 +1,8 @@
+Ajouter notification systeme pour plus d'infos
+
+a cote de tt telecharger choix audio/video
+pb info popup
+changer systeme parametres
+ajouter anglais
+
+commenter css et frontend/js

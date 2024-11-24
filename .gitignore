@@ -2,4 +2,7 @@
 **/.env*
 
 # Ignore tous les fichiers .txt dans tous les dossiers
-**/*.txt
+**/*.txt#
+
+# Ignore node_modules directory in all folders
+node_modules/
