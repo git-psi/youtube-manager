@@ -14,7 +14,7 @@
   "main": "backend/main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder" salut
   },
   "keywords": [],
   "author": "Félix Perdu",
