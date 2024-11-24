@@ -1,0 +1,7 @@
+Changer la version dans package.json
+
+Aller sur github et créer une release: https://github.com/git-psi/youtube-manager/releases/new
+
+Son nom: la version exacte (ex: 1.0.0)
+Son tag: la version exacte (ex: 1.0.0)
+Note non obligatoire
