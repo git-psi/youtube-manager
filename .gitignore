@@ -1,0 +1,5 @@
+# Ignore tous les fichiers .env (incluant .env.local, .env.development, etc.)
+**/.env*
+
+# Ignore tous les fichiers .txt dans tous les dossiers
+**/*.txt
