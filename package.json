@@ -9,11 +9,7 @@
   "build": {
     "appId": "com.youtube-manager.id",
     "productName": "Gestionnaire de Musique",
-    "keywords": ["youtube", "music", "manager", "download", "playlist", "musique", "gestionnaire"],
-    "artifactName": "${productName}-Setup-${version}.${ext}",
-    "win": {
-      "searchable": true
-    }
+    "artifactName": "${productName}-Setup-${version}.${ext}"
   },
   "main": "backend/main.js",
   "scripts": {
