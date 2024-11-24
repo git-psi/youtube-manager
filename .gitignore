@@ -6,3 +6,6 @@
 
 # Ignore node_modules directory in all folders
 node_modules/
+
+# Ignore dist directory in all folders
+dist/

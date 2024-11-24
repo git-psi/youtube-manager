@@ -1,12 +1,23 @@
-// Name of all existing settings
-const allSettings = ['selectedFolder', 'automaticUpdate', 'firstResult']
+// Name of all existing settings with their default values
+const defaultSettings = {
+    selectedFolder: '',
+    automaticUpdate: false,
+    firstResult: false
+}
 
 module.exports = (store, win, dialog, shell) => {
+    // Initialize settings with default values if they don't exist
+    Object.entries(defaultSettings).forEach(([key, defaultValue]) => {
+        if (store.get(key) === undefined) {
+            store.set(key, defaultValue);
+        }
+    });
+
     // Function to get a setting
     async function getSetting(event, settingName) {
-        if (allSettings.includes(settingName)){
-            return store.get(settingName, 0);
-        }else return 'Erreur'
+        if (defaultSettings.hasOwnProperty(settingName)) {
+            return store.get(settingName);
+        } else return 'Erreur'
     };
 
     // Function to open a folder dialog
@@ -23,7 +34,7 @@ module.exports = (store, win, dialog, shell) => {
     // Function to save settings
     async function saveSettings(event, settingsArray) {
         settingsArray.forEach(setting => {
-            if (allSettings.includes(setting[0])){
+            if (defaultSettings.hasOwnProperty(setting[0])){
                 store.set(setting[0], setting[1])
             }
         });
