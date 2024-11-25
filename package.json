@@ -1,5 +1,5 @@
 {
-  "name": "test-electron",
+  "name": "gestionnaire-de-musique",
   "version": "1.0.0",
   "repository": "https://github.com/git-psi/youtube-manager",
   "publish": {
@@ -9,7 +9,19 @@
   "build": {
     "appId": "com.youtube-manager.id",
     "productName": "Gestionnaire de Musique",
-    "artifactName": "${productName}-Setup-${version}.${ext}"
+    "executableName": "Gestionnaire-de-Musique",
+    "artifactName": "Gestionnaire-de-Musique-Setup-${version}.${ext}",
+    "icon": "build/icon.ico",
+    "win": {
+      "icon": "build/icon.ico",
+      "target": ["nsis"]
+    },
+    "mac": {
+      "icon": "build/icon.icns"
+    },
+    "linux": {
+      "icon": "build/icon.png"
+    }
   },
   "main": "backend/main.js",
   "scripts": {

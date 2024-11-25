@@ -22,6 +22,13 @@ const iconPath = process.platform === 'win32'
 // Load environment variables
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
+// Set the name of the app
+app.setName('Gestionnaire de Musique');
+// Add this line to set the app ID for notifications
+if (process.platform === 'win32') {
+    app.setAppUserModelId('Gestionnaire de Musique');
+}
+
 // Function to create the window
 function createWindow() {
     win = new BrowserWindow({
@@ -112,7 +119,6 @@ app.whenReady().then(async () => {
             win.webContents.send('want-quit-app')
         }
     });
-
     
 });
 
