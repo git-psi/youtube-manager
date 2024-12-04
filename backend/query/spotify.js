@@ -90,39 +90,46 @@ module.exports = (store, BrowserWindow, win) => {
 
     // Function to fetch the user's playlists
     async function fetchUserPlaylists() {
-        const playlistsData = [];
-    
-        // Get liked tracks
-        const likedRes = await spotifyFetch('https://api.spotify.com/v1/me/tracks')
+        try {
+            await generateToken()
 
-        const likedTracks = await likedRes.json();
+            const playlistsData = [];
+        
+            // Get liked tracks
+            const likedRes = await spotifyFetch('https://api.spotify.com/v1/me/tracks');
+            const likedTracks = await likedRes.json();
 
-        // Add liked tracks as a playlist
-        playlistsData.push({
-            infoName: "Titres likés",
-            infoThumbnail: "https://misc.scdn.co/liked-songs/liked-songs-640.png",
-            infoNumTracks: likedTracks.total,
-            infoHref: 'https://api.spotify.com/v1/me/tracks',
-            infoEmbed: false,
-        });
-
-        // Get all user playlists
-        const res = await spotifyFetch('https://api.spotify.com/v1/me/playlists')
-        playlists = await res.json();
-    
-        // For each playlist, get track details
-        for (const playlist of playlists.items) {
-            const embedUrl = `https://open.spotify.com/embed/playlist/${playlist.id}`;
             playlistsData.push({
-                infoName: playlist.name,
-                infoThumbnail: playlist.images[0]?.url || "",
-                infoNumTracks: playlist.tracks.total,
-                infoHref: playlist.tracks.href,
-                infoEmbed: embedUrl,
-            })
+                infoName: "Titres likés",
+                infoThumbnail: "https://misc.scdn.co/liked-songs/liked-songs-640.png",
+                infoNumTracks: likedTracks.total,
+                infoHref: 'https://api.spotify.com/v1/me/tracks',
+                infoEmbed: false,
+            });
+
+            // Get all user playlists
+            const res = await spotifyFetch('https://api.spotify.com/v1/me/playlists');
+            const playlists = await res.json();
+
+            // For each playlist, get track details
+            for (const playlist of playlists.items) {
+                if (!playlist) continue;
+                
+                const embedUrl = `https://open.spotify.com/embed/playlist/${playlist.id}`;
+                playlistsData.push({
+                    infoName: playlist.name,
+                    infoThumbnail: playlist.images[0]?.url || "",
+                    infoNumTracks: playlist.tracks.total,
+                    infoHref: playlist.tracks.href,
+                    infoEmbed: embedUrl,
+                });
+            }
+        
+            return playlistsData;
+        } catch (error) {
+            console.error("Erreur lors de la recuperation des playlists:", error);
+            throw error;
         }
-    
-        return playlistsData;
     }
 
     // Function to fetch the tracks of a playlist
