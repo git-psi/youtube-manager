@@ -40,7 +40,6 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
             devTools: !app.isPackaged,
         },
-        autoHideMenuBar: true,
     });
 }
 
