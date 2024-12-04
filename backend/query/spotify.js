@@ -30,7 +30,7 @@ module.exports = (store, BrowserWindow, win) => {
             const clientId = process.env.CLIENT_ID;
             const redirectUri = 'http://localhost/callback/spotify';
             // Set the scopes
-            const scopes = 'playlist-read-private playlist-read-collaborative user-library-read';
+            const scopes = 'playlist-read-private playlist-read-collaborative';
         
             const authUrl = `https://accounts.spotify.com/authorize?show_dialog=${forceOpen}&client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
         
