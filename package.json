@@ -1,5 +1,5 @@
 {
-  "name": "gestionnaire-de-musique",
+  "name": "ytflow",
   "version": "1.0.0",
   "repository": "https://github.com/git-psi/youtube-manager",
   "publish": {
@@ -7,17 +7,14 @@
     "releaseType": "release"
   },
   "build": {
-    "appId": "com.youtube-manager.id",
-    "productName": "Gestionnaire de Musique",
-    "executableName": "Gestionnaire-de-Musique",
-    "artifactName": "Gestionnaire-de-Musique-Setup-${version}.${ext}",
+    "appId": "com.ytflow.id",
+    "productName": "YtFlow",
+    "executableName": "YtFlow",
+    "artifactName": "YtFlow-Setup-${version}.${ext}",
     "icon": "build/icon.ico",
     "win": {
       "icon": "build/icon.ico",
       "target": ["nsis"]
-    },
-    "mac": {
-      "icon": "build/icon.icns"
     },
     "linux": {
       "icon": "build/icon.png",

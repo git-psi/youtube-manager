@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Title of the application -->
-    <title>Gestion de Musique</title>
+    <title>YtFLow</title>
     <!-- Include Bootstrap -->
     <link href="../node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
@@ -16,7 +16,14 @@
   </head>
 
   <div id="alertContainer" class="position-fixed bottom-0 start-0 end-0 p-3 center position-relative pe-none" style="z-index: 1000; height: 100px;">
-    <!-- Les alertes seront ajoutées ici -->
+    <!-- Alerts will be added here -->
+  </div>
+
+  <div id="onboardingDiv" class="position-fixed bottom-0 top-0 start-0 end-0 center bg-black z-3">
+    <div class="text-white text-center">
+      <p id="onboardingTitle" class="m-0 fs-1 fw-bold" style="user-select: none;">Bienvenue</p>
+      <p id="onboardingSubtitle" class="m-0" style="user-select: none;">Regardons ce que tu peux faire de plus près</p>
+    </div>
   </div>
 
   <body class="overflow-hidden" style="height: 100%;">
@@ -25,43 +32,59 @@
       <div class="p-2 pb-0 mb-2 overflow-auto d-flex justify-content-center" style="width: 100%;">
 
         <!-- Left part of the screen -->
-        <div style="width: 100%; max-width: 1140px;">
-          <!-- Div for search bar, and buttons for download -->
-          <div class="d-flex flex-row justify-content-center align-items-center">
+        <div style="width: 100%; max-width: 1140px;" id="totalLeftPartHeight">
+          <div id="topLeftPart">
+            <!-- Div for search bar, and buttons for download -->
+            <div class="d-flex flex-row justify-content-center align-items-center">
+  
+              <form id="searchBarForm" class="input-group me-3"
+                data-bs-toggle="popover"
+                data-bs-trigger="manual"
+                title="Barre de recherche"
+                data-bs-content="Tu peux coller l'url d'un vidéo youtube ou directement effectuer une recherche en rentrant des mots clés">
+                
+                <input type="text" id="searchBarInput" class="form-control border-primary" placeholder="Rechercher ou coller une URL">
+  
+                <button id="searchBarButton" class="btn btn-primary" type="submit" id="button-addon1">
+                  <i class="bi bi-search only-search"></i>
+                  <i class="bi bi-plus only-add" style="transform: scale(1.3);"></i>
+                </button>
+              </form>
+              <button id="spotifyPlaylistsBtn" class="btn btn-success d-flex align-items-center" style="white-space: nowrap;"><img src="../img/spotify.svg" alt="Playlist Spotify" class="me-2" style="height: 20px; width: 20px;"/>Playlist Spotify</button>
+            </div>
+            <div class="input-group mt-3 w-100 d-flex flex-row">
+              <button class="download-all btn btn-primary flex-grow-1" format="prechoose" style="white-space: nowrap;">Tout télécharger</button>
+              <div class="bg-primary-hover" style="height: 38px; width: 3px;"></div>
+              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Format spécifique</button>
+              <ul class="dropdown-menu">
+                <li><button class="download-all dropdown-item" format="mp3">Télécharger en Audio</button></li>
+                <li><a class="download-all dropdown-item" format="mp4">Télécharger en Vidéo</a></li>
+              </ul>
+            </div>
 
-            <form id="searchBarForm" class="input-group me-3">
-              <input type="text" id="searchBarInput" class="form-control border-primary" placeholder="Rechercher ou coller une url">
-              <button id="searchBarButton" class="btn btn-primary" type="submit" id="button-addon1">
-                <i class="bi bi-search only-search"></i>
-                <i class="bi bi-plus only-add" style="transform: scale(1.3);"></i>
-              </button>
-            </form>
-            <button id="spotifyPlaylistsBtn" class="btn btn-success d-flex align-items-center" style="white-space: nowrap;"><img src="../img/spotify.svg" alt="Playlist Spotify" class="me-2" style="height: 20px; width: 20px;"/>Playlist Spotify</button>
+            <hr style="margin-left: 25px; width: calc(100% - 50px);">
+            
           </div>
-          <div class="input-group mt-3 w-100 d-flex flex-row">
-            <button class="download-all btn btn-primary flex-grow-1" format="prechoose" style="white-space: nowrap;">Tout télécharger</button>
-            <div class="bg-primary-hover" style="height: 38px; width: 3px;"></div>
-            <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Format spécifique</button>
-            <ul class="dropdown-menu">
-              <li><button class="download-all dropdown-item" format="mp3">Télécharger en Audio</button></li>
-              <li><a class="download-all dropdown-item" format="mp4">Télécharger en Vidéo</a></li>
-            </ul>
-          </div>
-
-          <hr style="margin-left: 25px; width: calc(100% - 50px);">
   
           <!-- List of all music added -->
-          <div id="music-list" class="mt-4 position-relative" style="min-height: 100px;"></div>
-
-          <div class="position-fixed" style="bottom: 0; right: 0; z-index: 1000;">
-
+          <div id="musicList" class="mt-4 position-relative onboarding-bg-body" style="min-height: calc(100% - 200px);"
+            data-bs-toggle="popover" 
+            data-bs-trigger="manual"
+            title="Liste des musiques ajoutées" 
+            data-bs-content="Chaque musique (ou vidéo) que tu rajoute se retrouve ici, tu peux modifier ces informations avant de la télécharger">
           </div>
+
         </div>
       </div>
 
       <!-- Right part of the screen, downloading musics -->
-      <div class="bg-body-secondary shadow-sm d-flex flex-column justify-content-between" style="height: 100%;">
-        <div class="secondary-scrollbar overflow-auto p-2" id="download-queue">
+      <div class="bg-body-secondary shadow-sm d-flex flex-column justify-content-between" style="height: 100%;" id="totalRightPartHeight">
+        <div class="secondary-scrollbar overflow-auto p-2 onboarding-bg-body h-100" id="downloadQueue"
+          data-bs-toggle="popover" 
+          data-bs-trigger="manual"
+          title="Liste de téléchargement" 
+          data-bs-content="Ici est la file d'attente pour le téléchargement des musiques">
+
           <!-- Div for the list of downloading musics -->
           <div class="d-flex flex-column align-items-center mt-2">
             <h5 class="mb-0">Liste de téléchargement</h5>
@@ -133,7 +156,7 @@
               <div id="hidden-span" class="position-absolute" style="white-space: pre; visibility: hidden;"></div>
               
               <!-- Section for download settings -->
-              <div class="setting-section d-flex justify-content-between align-items-center w-100"><div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div>Téléchargement<div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div></div>
+              <div class="setting-section d-flex justify-content-between align-items-center w-100 mt-0"><div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div>Téléchargement<div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div></div>
               <div class="bg-body-tertiary rounded">
                 <div class="py-2 px-3 flex-row d-flex justify-content-between align-items-center">
                   <div class="d-flex flex-column">
@@ -154,7 +177,7 @@
                 <div class="py-2 px-3 flex-row d-flex justify-content-between align-items-center">
                   <div class="d-flex flex-column">
                     <b class="fw-bold text-body-secondary">Prendre le premier choix</b>
-                    Lors d'une recherche, prendre automatiquement la première vidéo au lieux de présenter un choix.
+                    Lors d'une recherche, prendre automatiquement la première vidéo au lieu de présenter un choix.
                   </div>
                   <div class="ms-3 form-control-lg form-switch">
                     <input id="firstResultToggle" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
@@ -168,7 +191,7 @@
                 <div class="py-2 px-3 flex-row d-flex justify-content-between align-items-center">
                   <div class="d-flex flex-column">
                     <b class="fw-bold text-body-secondary">Mise à jour automatique</b>
-                    Le logiciel se mettra a jour automatiquement lors de son lancement.
+                    Le logiciel se mettra à jour automatiquement lors de son lancement.
                   </div>
                   <div class="ms-3 form-control-lg form-switch">
                     <input id="automaticUpdateToggle" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
@@ -187,6 +210,21 @@
                   </div>
                   <div class="ms-3">
                     <button id="spotifyConnectBtn" class="btn btn-secondary" type="submit">Connexion</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section for restart from scratch -->
+              <div class="setting-section d-flex justify-content-between align-items-center w-100"><div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div>Application<div class="mx-2 bg-secondary w-100 rounded-5" style="height: 3px;"></div></div>
+              <div class="bg-body-tertiary rounded">
+                <!-- First setting -->
+                <div class="py-2 px-3 flex-row d-flex justify-content-between align-items-center">
+                  <div class="d-flex flex-column">
+                    <b class="fw-bold text-body-secondary">Repartir de zéro</b>
+                    Tout remettre à zéro, les paramètres, les comptes connectés, ...
+                  </div>
+                  <div class="ms-3">
+                    <button id="resetSettingsBtn" class="btn btn-danger">Tout oublier</button>
                   </div>
                 </div>
               </div>
@@ -254,26 +292,25 @@
       </div>
     </div>
 
-    <!-- Modal for quitting the application -->
-    <div id="quitAppModal" class="modal modal-lg" tabindex="-1">
+    <!-- Modal to ask confirmation -->
+    <div id="askConfimartionModal" class="modal modal-lg" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Fermer l'application</h5>
+            <h5 class="modal-title" id="askConfimartionModalTitle"></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            Êtes vous sûr de vouloir quitter l'application, les vidéos ajoutés et en cours de téléchargements ne seront pas sauvegardés !
-          </div>
+          <div class="modal-body" id="askConfimartionModalBody"></div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" id="quitAppBtn" class="btn btn-danger">Quitter</button>
+            <button type="button" id="askConfimartionModalBtn" class="btn">Quitter</button>
           </div>
         </div>
       </div>
     </div>
     
     <!-- Include all js script -->
+    <script src="./js/onboarding.js"></script>
     <script src="./js/quitApp.js"></script>
     <script src="./js/renderer.js"></script>
     <script src="./js/alert.js"></script>
@@ -283,5 +320,6 @@
     <script src="./js/searchSpotifyPlaylist.js"></script>
     <script src="./js/musicItem.js"></script>
     <script src="./js/downloadMusic.js "></script>
+    <script src="./js/askConfirmationModal.js "></script>
   </body>
 </html>

@@ -1,4 +1,6 @@
 module.exports = (store, BrowserWindow, win) => {
+    let generateTokenWindow = false
+
     // Get the spotify token
     let token = store.get('spotifyToken', 0)
 
@@ -26,16 +28,17 @@ module.exports = (store, BrowserWindow, win) => {
     // If forceOpen is true, force the auth window to open
     async function generateToken(forceOpen=false){
         return new Promise((resolve, reject) => {
+            if (generateTokenWindow){return}
             // Set the client ID and redirect URI
             const clientId = process.env.CLIENT_ID;
             const redirectUri = 'http://localhost/callback/spotify';
             // Set the scopes
-            const scopes = 'playlist-read-private playlist-read-collaborative';
+            const scopes = 'playlist-read-private playlist-read-collaborative user-library-read';
         
             const authUrl = `https://accounts.spotify.com/authorize?show_dialog=${forceOpen}&client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
         
             // Create the auth window
-            const authWindow = new BrowserWindow({
+            generateTokenWindow = new BrowserWindow({
                 width: 500,
                 height: 700,
                 show: false,
@@ -46,11 +49,11 @@ module.exports = (store, BrowserWindow, win) => {
 
             // If forceOpen is true, force the auth window to show
             if (forceOpen) {
-                authWindow.show()
+                generateTokenWindow.show()
             }else {
                 setTimeout(() => {
-                    if (!authWindow.isDestroyed()) {
-                        authWindow.show()
+                    if (!generateTokenWindow.isDestroyed()) {
+                        generateTokenWindow.show()
                     }
                 }, 1000)
             }
@@ -62,41 +65,55 @@ module.exports = (store, BrowserWindow, win) => {
                         token = new URL(url).hash.match(/access_token=([^&]*)/)[1];
                         // Utilise le token pour les requêtes API
                         store.set('spotifyToken', token)
-                        resolve(token)
+                        resolve(0)
                     }else if (url.includes("error")) {
                         const error = new URL(url).searchParams.get('error')
                         reject(error)
                     }
-                    authWindow.close();
+                    generateTokenWindow.close();
+                    setTimeout(() => {generateTokenWindow = false}, 1000)
                 }
             }
 
             // Check the URL every second
             const urlCheckInterval = setInterval(() => {
-                redirectUrl(authWindow.webContents.getURL())
+                redirectUrl(generateTokenWindow.webContents.getURL())
             }, 100);
 
             // Clean the interval when the window is closed
-            authWindow.on('closed', () => {
+            generateTokenWindow.on('closed', () => {
                 clearInterval(urlCheckInterval);
+                setTimeout(() => {generateTokenWindow = false}, 1000)
+                resolve(1)
             });
         
-            authWindow.webContents.on('will-redirect', (event, url) => {
+            generateTokenWindow.webContents.on('will-redirect', (event, url) => {
                 redirectUrl(url)
             });
-            authWindow.loadURL(authUrl);
+            generateTokenWindow.loadURL(authUrl);
         });
+    }
+
+    async function closeSpotifyWindow() {
+        if (generateTokenWindow){
+            generateTokenWindow.close()
+        }
     }
 
     // Function to fetch the user's playlists
     async function fetchUserPlaylists() {
         try {
-            await generateToken()
-
+            const res = await generateToken()
+            if (res == 1){
+                return {error: `Pour continuer, il fallait vous connecter.`}
+            }
             const playlistsData = [];
         
             // Get liked tracks
             const likedRes = await spotifyFetch('https://api.spotify.com/v1/me/tracks');
+            if (likedRes.status === 403) {
+                throw "Erreur 403";
+            }
             const likedTracks = await likedRes.json();
 
             playlistsData.push({
@@ -108,8 +125,11 @@ module.exports = (store, BrowserWindow, win) => {
             });
 
             // Get all user playlists
-            const res = await spotifyFetch('https://api.spotify.com/v1/me/playlists');
-            const playlists = await res.json();
+            const fetchedPlaylists = await spotifyFetch('https://api.spotify.com/v1/me/playlists');
+            if (fetchedPlaylists.status === 403) {
+                throw "Erreur 403";
+            }
+            const playlists = await fetchedPlaylists.json();
 
             // For each playlist, get track details
             for (const playlist of playlists.items) {
@@ -128,7 +148,7 @@ module.exports = (store, BrowserWindow, win) => {
             return playlistsData;
         } catch (error) {
             console.error("Erreur lors de la recuperation des playlists:", error);
-            throw error;
+            return {error: `Une erreur a eu lieu, l'application ne peut pas accéder à vos playlists.<br>Si vous n'avez pas autorisé l'accès à cette fonctionnalité, le problème vient de là. Si c'est le cas, tu peux m'envoyer l'adresse email du compte Spotify que tu souhaites utiliser, à <a class='link-body-emphasis' href="mailto:perdu.felix@proton.me?subject=Activer%20l%27option%20pour%20mon%20compte%20Spotify&body=Pourrais-tu activer la fonctionnalité Spotify pour: [email].">perdu.felix@proton.me</a> (ou sur n'importe quelle plateforme).<br>Une fois activée, cette fonctionnalité te permet de télécharger tes playlists Spotify.`};
         }
     }
 
@@ -171,5 +191,6 @@ module.exports = (store, BrowserWindow, win) => {
         generateToken,
         fetchUserPlaylists,
         fetchPlaylistTracks,
+        closeSpotifyWindow,
     }
 };

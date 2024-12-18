@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Functions for Spotify integration
   spotifyGenerateToken: () => ipcRenderer.invoke('spotify-generate-token'),
   spotifyFetchPlaylists: () => ipcRenderer.invoke('spotify-fetch-playlists'),
+  closeSpotifyWindow: () => ipcRenderer.invoke('close-spotify-window'),
   spotifyFetchPlaylistTracks: (href) => ipcRenderer.invoke('spotify-fetch-playlist-tracks', href),
   addSpotifyPlaylistTracks: (callback) => ipcRenderer.on('add-spotify-playlist-tracks', callback),
   
@@ -21,6 +22,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveSettings: (settingsArray) => ipcRenderer.invoke('save-settings', settingsArray),
   getSetting: (settingName) => ipcRenderer.invoke('get-setting', settingName),
   openFolder: () => ipcRenderer.invoke('open-folder'),
+  forgetAll: () => ipcRenderer.invoke('forget-all'),
 
   // Function for application updates
   update: () => ipcRenderer.invoke('update'),

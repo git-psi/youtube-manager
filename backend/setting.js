@@ -1,11 +1,15 @@
+const { session } = require('electron');
+
 // Name of all existing settings with their default values
 const defaultSettings = {
     selectedFolder: '',
     automaticUpdate: false,
-    firstResult: false
+    firstResult: false,
+    onboardingCompleted: false,
+    spotifyModalValidate: false,
 }
 
-module.exports = (store, win, dialog, shell) => {
+module.exports = (store, win, dialog, shell, app) => {
     // Initialize settings with default values if they don't exist
     Object.entries(defaultSettings).forEach(([key, defaultValue]) => {
         if (store.get(key) === undefined) {
@@ -34,8 +38,8 @@ module.exports = (store, win, dialog, shell) => {
     // Function to save settings
     async function saveSettings(event, settingsArray) {
         settingsArray.forEach(setting => {
-            if (defaultSettings.hasOwnProperty(setting[0])){
-                store.set(setting[0], setting[1])
+            if (defaultSettings.hasOwnProperty(setting[0])) {
+                store.set(setting[0], setting[1]);
             }
         });
     };
@@ -53,10 +57,21 @@ module.exports = (store, win, dialog, shell) => {
         }else return {error: 'Aucun dossier sélectionné, voir dans les paramètres'}
     }
 
+    // Function to restart from scratch
+    async function forgetAll() {
+        Object.entries(defaultSettings).forEach(([key, defaultValue]) => {
+            store.set(key, defaultValue);
+            session.defaultSession.clearStorageData();
+        });
+        app.relaunch(); // restart the app
+        app.exit(); // exit the current instance
+    }
+
     return {
         getSetting,
         openFolderDialog,
         saveSettings,
         openFolder,
+        forgetAll,
     }
 };

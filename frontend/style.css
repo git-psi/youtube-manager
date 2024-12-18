@@ -61,28 +61,28 @@
 }
 
 /* ===== Download Queue ===== */
-#download-queue {
+#downloadQueue {
     width: 300px;
     min-width: 300px;
 }
 
-#download-queue .only-download-paused {
+#downloadQueue .only-download-paused {
     display: none;
 }
 
-#download-queue.download-paused .only-download-paused {
+#downloadQueue.download-paused .only-download-paused {
     display: block;
 }
 
-#download-queue .download-music {
+#downloadQueue .download-music {
     height: 60px;
 }
 
-#download-queue .download-music:not(.downloading) .only-downloading {
+#downloadQueue .download-music:not(.downloading) .only-downloading {
     visibility: hidden;
 }
 
-#download-queue .download-music:not(:last-child) {
+#downloadQueue .download-music:not(:last-child) {
     margin-bottom: 10px;
 }
 
@@ -189,4 +189,89 @@
 .secondary-scrollbar::-webkit-scrollbar-track {
     border: 5px solid var(--bs-secondary-bg);
     background-color: #c7cbce;
+}
+
+/* ===== Carousel Indicators ===== */
+.carousel-indicators button {
+    background-color: var(--bs-secondary) !important;
+    opacity: 0.7;
+}
+
+.carousel-indicators button.active {
+    background-color: var(--bs-secondary) !important;
+}
+
+.carousel-indicators [data-bs-target] {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+}
+
+/* ===== Onboarding Styles ===== */
+#onboardingDiv:not(.view) {
+    display: none;
+}
+#onboardingDiv.view {
+    opacity: 1;
+}
+#onboardingDiv.second-part {
+    opacity: 0.5;
+    transition: 1s;
+}
+
+#onboardingTitle {
+    transition: 0.6s;
+    transform: scale(0.8);
+    opacity: 0;
+}
+#onboardingTitle.view {
+    transform: scale(1);
+    opacity: 1;
+}
+#onboardingTitle.close {
+    transition: 0.2s;
+    transform: translateY(-30px);
+}
+
+#onboardingSubtitle {
+    transition: 1s;
+    transform: translateY(10px);
+    opacity: 0;
+}
+#onboardingSubtitle.view {
+    transform: translateY(0px);
+    opacity: 1;
+}
+#onboardingSubtitle.close {
+    transition: 0.2s;
+    transform: translateY(-30px);
+}
+
+/* ===== Popover Styles ===== */
+.popover {
+    z-index: 9999 !important;
+    pointer-events: all;
+}
+
+/* ===== Has Shown Popover Styles ===== */
+.hasShownPopover {
+    pointer-events: none;
+    z-index: 9999 !important;
+    border-radius: 0.375rem;
+    position: relative;
+}
+.hasShownPopover.onboarding-bg-body {
+    background: var(--bs-body-bg);
+}
+.hasShownPopover::before {
+    content: '';
+    position: absolute;
+    border-radius: 7px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 3px dashed #0056b3;
+    pointer-events: none;
+    z-index: 9999 !important;
 }

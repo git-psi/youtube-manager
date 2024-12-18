@@ -2,7 +2,7 @@
 var musicId = 0;
 
 // The div that contain the list of music added
-const musicList = document.getElementById('music-list');
+const musicList = document.getElementById('musicList');
 // A dictionary to store music items by their IDs
 let musicItemDict = {} // id: class
 
@@ -38,10 +38,7 @@ class MusicItem {
                     <span style="width: 35px;" class="center input-group-text" data-bs-toggle="tooltip" data-bs-title="\\, /, :, *, ?, &quot;, <, > et | sont interdit">?</span>
                     <input id="music-title-${musicId}" disabled type="text" placeholder="Nom du fichier" class="form-control music-item-title" value="${this.title}">
                 </div>
-                <div class="input-group input-group-sm">
-                    <span style="width: 35px;" class="center input-group-text" data-bs-toggle="tooltip" data-bs-title="Séparer chaque auteurs d'une virgule">?</span>
-                    <input disabled type="text" placeholder="Auteur" class="form-control music-item-author" value="${this.author}">
-                </div>
+                <input disabled type="text" placeholder="Auteur" class="form-control music-item-author" value="${this.author}" />
                 <input class="music-item-url" value="${this.url}" hidden>
             </div>
             <div class="ms-2 d-flex flex-column justify-content-start h-100">

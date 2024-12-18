@@ -48,7 +48,7 @@ module.exports = (innertube) => {
                 );
             }
             if (!searchResults[0]) {
-                return { error: 'Aucune vidéo ne convient à la recherche: ' + (didYouMean || search) }
+                return { error: 'Aucune vidéo ne convient à la recherche : ' + (didYouMean || search) }
             }
         }
 

@@ -6,6 +6,12 @@ async function showSpotifyPlaylists() {
     try {
         // Show the search modal
         searchModalObject.show()
+
+        searchModal.addEventListener('hidden.bs.modal', function (event) {
+            if (bootstrapModalActiveEvent){
+                window.electronAPI.closeSpotifyWindow()
+            }
+        }, { once: true });
         
         // Set the modal title
         searchModalTitle.innerText = "Playlists Spotify"
@@ -14,6 +20,14 @@ async function showSpotifyPlaylists() {
         
         // Fetch playlists from Spotify via the backend
         const playlists = await window.electronAPI.spotifyFetchPlaylists()
+
+        if(playlists.error){
+            const errorItem = document.createElement('p')
+            errorItem.className = 'm-0 result'
+            errorItem.innerHTML = playlists.error
+            allResults.appendChild(errorItem)
+            return;
+        }
         
         if (playlists.length === 0) {
             showSearchModalMessage("Aucune playlist trouvée dans votre bibliothèque Spotify.")
@@ -74,7 +88,7 @@ async function showSpotifyPlaylists() {
             allResults.appendChild(resultItem)
         });
         
-        showSearchModalMessage("Si vous n'arrivez pas à trouver la playlist que vous cherchez, c'est qu'elle n'est pas dans votre bibliothèque Spotify.")
+        showSearchModalMessage("Si vous n'arrivez pas à trouver la playlist que vous cherchez, cela peut être dû au fait qu'elle ne soit pas dans votre bibliothèque ou que vous n'avez pas Spotify Premium.")
     } catch (error) {
         console.error("Erreur lors de l'affichage des playlists:", error);
         searchModalObject.hide();
@@ -95,5 +109,26 @@ window.electronAPI.addSpotifyPlaylistTracks(async (event, tracks) => {
             }
         }
         addingTracks = false
+    }
+})
+
+// When the user click on the spotify connect button, generate a token
+const spotifyConnectBtn = document.getElementById('spotifyConnectBtn')
+spotifyConnectBtn.addEventListener('click', () => {
+    window.electronAPI.spotifyGenerateToken()
+})
+// When the user click on the spotify playlists button, show the spotify playlists
+const spotifyPlaylistsBtn = document.getElementById('spotifyPlaylistsBtn')
+spotifyPlaylistsBtn.addEventListener('click', async () => {
+    const spotifyModalValidate = await window.electronAPI.getSetting('spotifyModalValidate')
+    if (spotifyModalValidate) {
+        showSpotifyPlaylists()
+    }else {
+        askConfimartion("Spotify", `À cause de restrictions imposées par Spotify, cette fonctionnalité ne peut pas être activée par défaut. Si tu veux l'activer, rien de plus simple: envoie-moi l'adresse email du compte Spotify que tu souhaites utiliser, à <a class='link-body-emphasis' href="mailto:perdu.felix@proton.me?subject=Activer%20l%27option%20pour%20mon%20compte%20Spotify&body=Pourrais tu activer la fonctionnalité Spotify pour: [email].">perdu.felix@proton.me</a> (ou sur n'importe quelle plateforme).<br><br>Une fois activée, cette fonctionnalité te permet de télécharger tes playlists Spotify.`, "primary", undefined, "Continuer").then(wantContinue => {
+            if (wantContinue) {
+                window.electronAPI.saveSettings([['spotifyModalValidate', true]]);
+                showSpotifyPlaylists()
+            }
+        })
     }
 })

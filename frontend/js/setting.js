@@ -90,13 +90,25 @@ saveSettingsBtn.addEventListener('click', () => {
 
 // Update UI with saved settings when modal is shown
 settingModal.addEventListener('shown.bs.modal', function (event) {
-    folderPathInput.value = savedDownloadDirectory;
-    automaticUpdateToggle.checked = automaticUpdate;
-    firstResultToggle.checked = firstResult;
-    adjustPathToFit(savedDownloadDirectory);
+    if (bootstrapModalActiveEvent){
+        folderPathInput.value = savedDownloadDirectory;
+        automaticUpdateToggle.checked = automaticUpdate;
+        firstResultToggle.checked = firstResult;
+        adjustPathToFit(savedDownloadDirectory);
+    }
 });
 // Reset folder path input when modal is closed
 settingModal.addEventListener('', function (event) {
-    folderPathInput.value = savedDownloadDirectory;
+    if (bootstrapModalActiveEvent){
+        folderPathInput.value = savedDownloadDirectory;
+    }
 });
 
+// Reset settings when reset button clicked
+document.getElementById('resetSettingsBtn').addEventListener('click', async () => {
+    const confirmation = confirm("Êtes-vous sûr de vouloir tout réinitialiser ? Cela supprimera toutes les configurations et les sessions ouvertes.");
+    if (confirmation) {
+        // Reset settings to default values
+        window.electronAPI.forgetAll();
+    }
+});

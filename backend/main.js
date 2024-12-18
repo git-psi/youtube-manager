@@ -1,5 +1,5 @@
 // Require functionnality from electron
-const { app, BrowserWindow, ipcMain, shell, Notification, Menu, Tray, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, Notification, dialog } = require('electron');
 // Require path to handle file paths
 const path = require('path');
 
@@ -17,28 +17,31 @@ let allowQuit = false
 // Define the icon path based on the platform
 const iconPath = process.platform === 'win32'
 ? path.resolve(__dirname, '../img/icon.ico')  // Use .ico for Windows
-: path.resolve(__dirname, '../img/icon.png')  // Use .png for macOS/Linux
+: path.resolve(__dirname, '../img/icon.png')  // Use .png for Linux
 
 // Load environment variables
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // Set the name of the app
-app.setName('Gestionnaire de Musique');
+app.setName('YtFlow');
 // Add this line to set the app ID for notifications
 if (process.platform === 'win32') {
-    app.setAppUserModelId('Gestionnaire de Musique');
+    app.setAppUserModelId('YtFlow');
 }
 
 // Function to create the window
 function createWindow() {
     win = new BrowserWindow({
+        width: 900,
+        height: 600,
         minWidth: 900,
         minHeight: 600,
         icon: iconPath,
         show: false,
+        autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            devTools: !app.isPackaged,
+            devTools: true,
         },
     });
 }
@@ -66,20 +69,9 @@ app.whenReady().then(async () => {
     // Create innertube instance
     innertube = await Innertube.create();
 
-    // Create tray icon
-    let appIcon = null
-    appIcon = new Tray(iconPath)
-    const contextMenu = Menu.buildFromTemplate([
-        { label: 'Quitter immédiatement', click: app.quit }
-    ])
-    appIcon.setContextMenu(contextMenu)
-    appIcon.on('click', () => {
-        showWindow()
-    })
-
     // Require all other js files
     const downloadJS = require('./download')(store, path)
-    const settingJS = require('./setting')(store, win, dialog, shell)
+    const settingJS = require('./setting')(store, win, dialog, shell, app)
     const updateJS = require('./update')(win, app, settingJS, Notification)
     const queryYoutubeJS = require('./query/youtube')(innertube)
     const querySpotifyJS = require('./query/spotify')(store, BrowserWindow, win)
@@ -93,6 +85,7 @@ app.whenReady().then(async () => {
     ipcMain.handle('save-settings', settingJS.saveSettings);
     ipcMain.handle('open-folder-dialog', settingJS.openFolderDialog);
     ipcMain.handle('open-folder', settingJS.openFolder);
+    ipcMain.handle('forget-all', settingJS.forgetAll);
 
     ipcMain.handle('fetch-video-info', queryYoutubeJS.fetchVideoInfo);
     ipcMain.handle('multiple-search', queryYoutubeJS.multipleSearch);
@@ -101,6 +94,7 @@ app.whenReady().then(async () => {
     ipcMain.handle('spotify-generate-token', () => {querySpotifyJS.generateToken(true)});
     ipcMain.handle('spotify-fetch-playlists', querySpotifyJS.fetchUserPlaylists);
     ipcMain.handle('spotify-fetch-playlist-tracks', querySpotifyJS.fetchPlaylistTracks);
+    ipcMain.handle('close-spotify-window', querySpotifyJS.closeSpotifyWindow);
     
     ipcMain.handle('quit-app',() => {app.quit()});
     ipcMain.handle('focus-app',() => {showWindow()});

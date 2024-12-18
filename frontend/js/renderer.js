@@ -22,36 +22,38 @@ const goToNextDownloadBtn = document.getElementById('goToNextDownloadBtn');
 let returnToSearchModal = false;
 
 // The div that contain the list of downloading musics
-const downloadQueueList = document.getElementById('download-queue');
+const downloadQueueList = document.getElementById('downloadQueue');
 
 // The button to open the folder
 const openFolderBtn = document.getElementById('openFolderBtn');
 
-
-
 // When the user click on the open folder button, open the folder in wich the musics are downloaded
 openFolderBtn.addEventListener('click', async () => {
   const res = await window.electronAPI.openFolder()
-  if (res.error){
+  if (res && res.error){
     createAlert(res.error, 'danger')
   }
 })
 
 // Close the video when the video modal is closed
 videoModal.addEventListener('hidden.bs.modal', function (event) {
-  videoFrame.removeAttribute("src")
-  if (returnToSearchModal){
-    searchModalObject.show()
-    returnToSearchModal = false;
+  if (bootstrapModalActiveEvent){
+    videoFrame.removeAttribute("src")
+    if (returnToSearchModal){
+      searchModalObject.show()
+      returnToSearchModal = false;
+    }
   }
 });
 
 // Close the spotify iframe when the spotify modal is closed
 spotifyModal.addEventListener('hidden.bs.modal', function (event) {
-  spotifyFrame.removeAttribute("src")
-  if (returnToSearchModal){
-    searchModalObject.show()
-    returnToSearchModal = false;
+  if (bootstrapModalActiveEvent){
+    spotifyFrame.removeAttribute("src")
+    if (returnToSearchModal){
+      searchModalObject.show()
+      returnToSearchModal = false;
+    }
   }
 });
 
@@ -127,8 +129,16 @@ function isValidUrl(url) {
 
 // Setup all tooltip
 function setupTooltip() {
-  const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltips].map(e => new bootstrap.Tooltip(e))
+  const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  
+  tooltips.forEach(tooltip => {
+      // Check if the tooltip already exists
+      const existingTooltip = bootstrap.Tooltip.getInstance(tooltip);
+      if (!existingTooltip) {
+        // Create a new instance
+        new bootstrap.Tooltip(tooltip);
+      }
+  });
 }
 
 // Hide all tooltip
@@ -143,13 +153,7 @@ function hideTooltip() {
   });
 }
 
-// When the user click on the spotify connect button, generate a token
-const spotifyConnectBtn = document.getElementById('spotifyConnectBtn')
-spotifyConnectBtn.addEventListener('click', () => {
-  window.electronAPI.spotifyGenerateToken()
-})
-// When the user click on the spotify playlists button, show the spotify playlists
-const spotifyPlaylistsBtn = document.getElementById('spotifyPlaylistsBtn')
-spotifyPlaylistsBtn.addEventListener('click', () => {
-  showSpotifyPlaylists()
-})
+// Hide all tooltips when any modal is closed
+document.addEventListener('hidden.bs.modal', () => {
+    hideTooltip();
+});
